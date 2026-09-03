@@ -29,30 +29,30 @@ flowchart LR
 ## Approach
 
 ### Data & Features
-- **Input**: Pre-computed log-mel spectrogram features (40-dimensional) extracted with a 10 ms hop length.
-- **Label processing**: Annotations from multiple annotators were averaged to produce soft labels per segment, then binarized at 0.5 for classical model training.
-- **Feature engineering**: Delta and delta-delta coefficients were appended to capture spectral dynamics, yielding 120-dimensional feature vectors. Features were standardized (zero mean, unit variance) using statistics from the training set.
+- **Input**: Per-recording feature/annotation files (`.npz`) covering all splits; the raw waveform is not needed for the final system.
+- **Label processing**: Each recording carries per-annotator annotations as a `[T, C, A]` tensor. Soft labels = mean over annotators; hard labels = majority vote (mean >= 0.5), matching the official evaluator's rule.
+- **Feature engineering**: Each one-second analysis window (0.5 s hop) is described by statistics (mean/std/min/max) over spectral/temporal descriptors — mel spectrogram, MFCC (+ first/second-order deltas), spectral centroid/bandwidth/contrast/rolloff/flux/flatness, zero-crossing rate, energy and power. The descriptor statistics are stacked into a single 960-dimensional vector per segment.
+- **Scaling**: Imputation + z-score standardization, fit on the training split only and applied to validation/test (no leakage).
 
 ### Modeling
-We evaluated three classifiers for frame-wise sound event detection:
+The final system is a set of independent per-class binary Logistic Regression classifiers (multi-label one-vs-rest). A decision-tree baseline was provided with the challenge and reproduced for comparison; random forests were considered during model selection in an earlier task stage, and logistic regression was selected because it generalized better on the validation split.
 
-| Model               | Feature Representation | Temporal Context | Role |
+| Model               | Feature Representation | Temporal context | Role |
 | ------------------- | ---------------------- | ----------------: | ---- |
-| Decision Tree       | Log-mel + deltas       | No                | Baseline provided for reference |
-| Logistic Regression | Log-mel + deltas       | No                | Linear classifier with L2 regularization |
-| Random Forest       | Log-mel + deltas       | No                | Ensemble of decision trees |
+| Decision Tree       | 960-d descriptor stats  |               No | provided challenge baseline, reproduced |
+| Logistic Regression | 960-d descriptor stats  |               No | final system (one binary LR per class) |
 
-All models treat each one-second segment as an independent sample (no explicit temporal modeling). Hyperparameter tuning was performed on the validation set:
-- Logistic regression: regularization strength C ∈ {0.001, 0.01, 0.1, 1, 10}
-- Random forest: number of trees ∈ {10, 50, 100, 200}, max depth ∈ {5, 10, None}
+All classifiers treat each segment as an independent sample; temporal coherence is handled explicitly by the post-processing stage. Hyperparameters and decision thresholds were selected on the validation split:
+- Logistic regression: regularization strength `C` swept over {0.001, 0.01, 0.1, 1, 10} × class weighting {none, balanced}; **C=0.01, no weighting** won.
+- Per-class decision thresholds tuned on the validation split over a 0.05–0.95 grid (maximizing per-class F1), never on the hidden test set.
 
 ### Handling Class Imbalance
-- No class weighting in logistic regression (found to hurt validation macro F1).
-- Instead, we tuned decision thresholds per class on the validation set to optimize macro F1.
-- Post-processing: median filtering applied to each class’s probability time series to suppress isolated predictions, with window size tuned on validation data.
+- Class weighting (`balanced`) *hurt* validation macro F1 for every tested `C` — recall gains were outweighed by false positives on the abundant background segments.
+- Instead, per-class decision thresholds were tuned on the validation split to optimize per-class F1 (the macro average is dominated by the weakest classes).
+- Temporal post-processing: median filtering of each class's probability time series, applied per recording (never across recording boundaries). Window size was selected on the validation split.
 
 ### Event Reconstruction
-Segment-wise probabilities (after post-processing) were thresholded at 0.5 to obtain binary segment predictions. Consecutive segments with the same label were merged into events, and events shorter than 0.5 seconds were removed to eliminate spurious detections.
+Post-processed probabilities are thresholded per class into binary segment predictions. Consecutive active segments of the same class are merged into single events and emitted as `filename, annotation, onset, offset` rows for submission.
 
 ## Results
 
@@ -68,11 +68,12 @@ Performance on the non-hidden test set (used for validation during development):
 *Explored alternative post‑processing strategies (not selected for final submission).
 
 **Key findings**
-- Adding delta features (spectral dynamics) provided a consistent boost over static log‑mel alone.
-- Threshold tuning per class improved macro F1 by ~0.04 over a global threshold, highlighting the impact of imbalance.
-- Median filtering (window ≈ 5 s) reduced false positives from short, spiky predictions, raising macro F1 by ~0.02.
-- The best‑performing post‑processing variant (class‑dependent thresholds and selections) yielded further gains but was omitted from the final pipeline to maintain simplicity and reproducibility.
-- Short‑duration classes (e.g., `window_open_close`, `door_open_close`) remained the most challenging, confirming that temporal support limits detection performance.
+- The tuned logistic-regression system roughly **doubled the decision-tree baseline** on the non-hidden test set (0.541 vs 0.317 macro F1) — per-class boundaries learned from the 960-d features matter far more than the provided stump-like baseline.
+- Classes are very unequal in difficulty: the baseline's per-class F1 ranges from 0.578 (running water) down to 0.061 (window open/close); short, impulsive events with similar spectra (window/door/wardrobe) are the hard tail.
+- Class weighting (`balanced`) consistently reduced macro F1 across all `C` values on validation — more recall on rare classes was not worth the false positives.
+- Per-class validation-tuned thresholds beat a global 0.5 threshold by a large margin.
+- Median filtering of per-class probabilities (window = 5 s) improved non-hidden-test macro F1 from 0.541 to **0.559** by suppressing spurious isolated activations; larger windows (>= 9 s) start to erase genuinely short events.
+- Stronger, class-aware post-processing variants reached 0.569 macro F1 on the non-hidden test split, but the final submission kept the simpler, reproducible median-filter system.
 
 ## Repository Structure
 

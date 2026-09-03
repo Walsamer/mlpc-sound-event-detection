@@ -9,11 +9,12 @@ from pathlib import Path
 
 # --- Paths -----------------------------------------------------------------------
 # Resolved relative to this file so notebooks work regardless of CWD.
+# The challenge dataset is not redistributable (see docs/DATASET.md). Override the
+# data root at runtime with the MLPC_DATA_DIR environment variable when needed.
 TASK_DIR = Path(__file__).resolve().parents[1]
-EXTERNAL_DATA_ROOT = Path("/Volumes/2TB_drive/jku_coding/SS26/mlpc/data_task5")
-DATA_DIR = EXTERNAL_DATA_ROOT / "MLPC2026_challenge"
-RAW_DATA_DIR = EXTERNAL_DATA_ROOT / "MLPC2026_challenge_raw"
-BASELINE_DIR = EXTERNAL_DATA_ROOT / "challenge_baseline"
+DATA_ROOT = Path(__import__("os").environ.get("MLPC_DATA_DIR", str(TASK_DIR / "data")))
+DATA_DIR = DATA_ROOT / "MLPC2026_challenge"
+RAW_DATA_DIR = DATA_ROOT / "MLPC2026_challenge_raw"
 TRAIN_DIR = DATA_DIR / "train"
 VALIDATION_DIR = DATA_DIR / "validation"
 TEST_DIR = DATA_DIR / "test"          # hidden test: features only, no labels

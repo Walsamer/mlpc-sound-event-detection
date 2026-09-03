@@ -1,57 +1,84 @@
 # Dataset
 
-## Original Dataset
-The sound event detection challenge used a custom dataset provided by the Machine Learning and Pattern Classification course at Johannes Kepler University Linz, SS 2026. The dataset consists of domestic audio recordings annotated for 15 sound-event classes.
+## Availability
 
-Due to licensing restrictions, the original dataset is **not included** in this repository. The dataset was provided for use within the university course only.
+The dataset was created for use within the Machine Learning and Pattern Classification
+course at Johannes Kepler University Linz (SS 2026) and is **not redistributable**. It is
+therefore **not included** in this repository.
 
-## Expected Dataset Structure
-To run the code in this repository, the dataset must be placed in the `data/` directory with the following structure:
+To run the pipeline you need the challenge dataset (`MLPC2026_challenge`). Place it at
 
 ```
-data/
-└── MLPC2026_challenge/
-    ├── train/
-    │   ├── audio/
-    │   │   ├── 000001.wav
-    │   │   └── ...
-    │   ├── features/
-    │   │   ├── 000001.npz
-    │   │   └── ...
-    │   ├── metadata.csv
-    │   └── annotations.csv
-    ├── validation/
-    │   ├── audio/
-    │   │   ├── 000001.wav
-    │   │   └── ...
-    │   ├── features/
-    │   │   ├── 000001.npz
-    │   │   └── ...
-    │   ├── metadata.csv
-    │   └── annotations.csv
-    └── test/
-        ├── audio/
-        │   ├── 000001.wav
-        │   │   └── ...
-        ├── features/
-        │   │   ├── 000001.npz
-        │   │   └── ...
-        └── metadata.csv
+data/MLPC2026_challenge/
 ```
 
-## Feature Files
-- Each `.npz` file contains a variable `logmel` of shape `(T, 40)` where `T` is the number of time steps (frames) and 40 is the number of mel bands.
-- Features are extracted with a hop length of 10 ms and window size of 20 ms (yielding 100 frames per second of audio).
-- The provided features are log-mel spectrograms (already compressed to decibel scale).
+or point `MLPC_DATA_DIR` at its parent directory. All paths in `src/config.py` are
+relative to the repository root and can be overridden with that environment variable.
 
-## Metadata
-- `metadata.csv` contains columns: `filename`, `duration`, and possibly other metadata.
+## Expected layout
 
-## Annotations
-- `annotations.csv` contains per-annotator per-segment per-class labels (values 0, 1, or possibly fractional for multiple annotators).
-- The labeling pipeline averages over annotators to produce soft labels, then binarizes at 0.5 for classical model training.
+```
+data/MLPC2026_challenge/
+├── train/
+│   ├── audio_features/
+│   │   ├── 000001.npz
+│   │   └── ...
+│   └── metadata.csv            # per-recording metadata (train/validation only)
+├── validation/
+│   ├── audio_features/...
+│   └── metadata.csv
+└── test/
+    ├── audio_features/...      # hidden test: no annotations / no metadata
+    └── metadata.csv
+```
+
+## Recording files (`audio_features/*.npz`)
+
+Each `.npz` stores, for one recording:
+
+| key            | shape            | meaning                                              |
+| -------------- | ---------------- | ---------------------------------------------------- |
+| `annotations`  | `[T, C, A]`      | per-segment, per-class, per-annotator binary labels  |
+| `class_names`  | `[C]`            | the 15 sound-event classes                           |
+| `start_time`   | `[T]`            | onset of each analysis segment (s)                   |
+| `end_time`     | `[T]`            | offset of each analysis segment (s)                  |
+| feature keys   | `[T, d]`         | per-segment descriptor statistics (see below)        |
+
+### Features
+
+Per-segment statistics (mean / std / min / max) are computed over 1-second analysis
+windows (0.5 s hop) for spectral/temporal descriptors:
+
+- zero-crossing rate
+- mel spectrogram
+- MFCC, plus first-order (`mfcc_d`) and second-order (`mfcc_d2`) deltas
+- spectral flux, flatness, centroid, bandwidth, contrast
+- rolloff (low & high), energy, power
+
+`data_io.stack_feature_matrix` stacks all descriptor statistics into one
+**960-dimensional vector per segment** (`X` of shape `[N, 960]`).
+
+### Class label space (15 classes)
+
+```
+bell_ringing, coffee_machine, cutlery_dishes, door_open_close, footsteps,
+keyboard_typing, keychain, light_switch, microwave, phone_ringing,
+running_water, toilet_flushing, vacuum_cleaner, wardrobe_drawer_open_close,
+window_open_close
+```
+
+### Labels
+
+- Soft label per segment/class = mean over annotators.
+- Hard label (used for training and for evaluation against the official metric)
+  = majority vote, i.e. soft >= 0.5, matching the evaluator's rule.
 
 ## Notes
-- The raw audio files are only needed if extracting features from scratch; the provided features suffice for the classical models.
-- The test set does not include `annotations.csv`; predictions are submitted for the test set only.
-- Feature extraction parameters (if needed): sample rate 16000 Hz, n_mels=40, hop_length=160, win_length=400, fmin=0, fmax=8000.
+
+- The hidden `test/` split contains **no** annotations — submissions are event CSVs
+  (`filename, annotation, onset, offset`) scored by the official segment-based macro F1.
+- Development decisions (thresholds, post-processing windows, model selection) were made
+  exclusively on `train/` + `validation/`; the "non-hidden test" numbers quoted in the
+  README come from re-scoring on a split whose labels were visible during the course.
+- Raw waveforms are only required for bonus/analysis work; the provided features suffice
+  for the classical pipeline in this repository.

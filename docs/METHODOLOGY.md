@@ -1,73 +1,82 @@
 # Methodology
 
-## Problem Definition
-- **Task**: Sound Event Detection (SED) for 15 domestic sound-event classes.
-- **Input**: Audio recordings up to 35 seconds, represented as log-mel spectrogram features (extracted via librosa).
-- **Output**: Presence of each class in each one-second segment (binary prediction per class per segment).
-- **Evaluation Metric**: Segment-based Macro F1 at 1-second resolution (official metric).
-- **Dataset Structure**: 
-  - Split into training, validation, and test sets (test labels hidden for final submission).
-  - Each audio file has corresponding `.npz` feature file and `metadata.csv`.
-  - Annotations provided per annotator per class per time segment (soft labels averaged and binarized at 0.5 for classical models).
+## Problem
 
-## Data Preparation
-1. **Feature Extraction**: Log-mel spectrogram features were precomputed and provided in `.npz` files.
-2. **Label Aggregation**: 
-   - Annotations from multiple annotators were averaged to produce soft labels per segment per class.
-   - Soft labels were binarized at threshold 0.5 to obtain hard labels for training classical models.
-   - For CNN training, soft labels were used directly with binary cross-entropy loss.
-3. **Dataset Splitting**: 
-   - Official train/validation/test split provided by the challenge.
-   - No leakage: statistics (scalers, thresholds) computed only on training and validation sets.
+Segment-based Sound Event Detection (SED) over 15 domestic sound-event classes:
 
-## Feature Engineering
-- **Base Features**: 40-dimensional log-mel spectrogram coefficients.
-- **Derived Features**: 
-  - Delta features (first and second order) to capture spectral dynamics.
-  - Optional: statistical functionals (mean, std, etc.) over fixed-size windows (not used in final classical models).
-- **Feature Processing**:
-  - Z-score normalization (fit on training, applied to validation and test).
-  - Feature selection (optional) based on variance or mutual information (not used in final model).
-  - Final feature dimensionality: typically 120 (40 * 3 for delta-delta) after normalization.
+- **Input** — per-recording `.npz` files with per-segment descriptor features and
+  per-annotator annotations (see `docs/DATASET.md`).
+- **Output** — per-second presence per class, converted into `(onset, offset)` events
+  for the official submission format.
+- **Metric** — segment-based **macro F1** at 1-second resolution (per-class F1 averaged
+  over classes, computed on aligned 1 s multi-label segments).
 
-## Model Pipeline
-1. **Baseline**: Decision-tree classifier (provided by course) for initial benchmark.
-2. **Classical Models**:
-   - Logistic Regression (with L2 regularization, hyperparameter-tuned C)
-   - Random Forest (hyperparameter-tuned number of trees and depth)
-   - Models trained on segment-level features (each segment treated as independent sample).
-3. **Temporal Post-Processing**:
-   - Median filtering applied to per-class segment probabilities to reduce isolated predictions.
-   - Window size tuned on validation set.
-4. **Prediction Aggregation**:
-   - Segment-wise probabilities (after post-processing) converted to event predictions via thresholding and connected component analysis.
-   - Events merged if gap < threshold (temporal smoothing).
-   - Final submission: CSV file with columns `filename`, `onset`, `offset`, `event_label`.
+## Label construction
 
-## Experimental Design
-- **Train/Validation/Test**: Used the official split; validation used for hyperparameter tuning and threshold optimization.
-- **Class Imbalance**: 
-  - No class weighting in logistic regression (found to decrease performance).
-  - Threshold tuning per class on validation set to optimize Macro F1.
-- **Random Seeds**: Fixed seeds for reproducibility (numpy, scikit-learn, torch).
-- **Hyperparameter Tuning**: 
-  - Logistic Regression: swept C values (e.g., 0.001, 0.01, 0.1, 1, 10).
-  - Random Forest: swept number of trees (e.g., 10, 50, 100, 200) and max depth.
-  - Post-processing: swept median filter window sizes (e.g., 1, 3, 5, 7, 9 seconds).
-- **Model Selection**: Based on validation Macro F1; final model evaluated on non-hidden test set.
+1. Load per-recording annotation tensor `[T, C, A]` (`A` annotators).
+2. Soft labels: mean over the annotator axis → `[T, C]` in [0, 1].
+3. Hard labels: majority vote (soft >= 0.5) → `[T, C]` binary, matching the official
+   evaluator's rule (`src/labels.py`).
 
-## Evaluation
-- **Primary Metric**: Segment-based Macro F1 (average of per-class F1 scores).
-- **Secondary Metrics**: Per-class F1, confusion matrix, precision/recall trade-offs.
-- **Statistical Significance**: Not formally computed; improvements judged by absolute Macro F1 gains.
-- **Error Analysis**: Qualitative inspection of spectrograms for false positives/negatives, particularly for short-duration classes.
+## Feature engineering
+
+- Per 1 s analysis window (0.5 s hop), a compact statistic summary (mean/std/min/max)
+  is computed for each descriptor (mel spectrogram, MFCC + deltas, spectral
+  centroid/bandwidth/contrast/rolloff/flux/flatness, ZCR, energy, power).
+- Descriptor statistics are stacked into a 960-dimensional vector per segment
+  (`src/features.py`, `src/data_io.py`).
+- An imputation + z-score pipeline is fit on the **training split only** and then
+  applied to validation/test — no leakage of scaler statistics.
+
+## Models
+
+Independent per-class binary classifiers (multi-label one-vs-rest):
+
+- **Decision-tree baseline** — supplied with the challenge; reproduced for a reference
+  point (non-hidden-test macro F1 ≈ 0.317).
+- **Logistic Regression (final)** — one L2-regularized binary classifier per class.
+  Hyperparameters were selected on validation: `C ∈ {0.001, 0.01, 0.1, 1, 10}` × class
+  weighting `{none, balanced}`. Winner: **C = 0.01, no class weighting** (validation
+  macro F1 ≈ 0.523).
+- Random forests were explored during model selection in an earlier course stage; LR was
+  chosen because it generalized better on validation.
+
+## Class imbalance & thresholds
+
+- Balanced class weighting consistently reduced validation macro F1 (false positives on
+  the abundant background outweigh rare-class recall gains).
+- Instead, per-class decision thresholds are tuned on **validation only**, scanning a
+  0.05–0.95 grid to maximize per-class F1 (`src/predict.py::tune_thresholds`).
+- Resulting thresholds are stored with the model artifacts and applied to validation,
+  non-hidden test, and (in inference) to the hidden test.
+
+## Temporal post-processing
+
+- Median filtering of per-class probability sequences, applied **per recording** so
+  filtering never crosses recording boundaries (`src/postprocess_variants.py`).
+- Window size swept on validation (`w ∈ {1, 3, 5, 7, 9, 11}` s). `w = 5` was selected:
+  it raises non-hidden-test macro F1 from 0.541 → 0.559 by suppressing isolated spurious
+  activations while preserving short genuine events.
+- Experiment logs: `results/metrics/02_postprocessing_window_sweep_from_andreas.csv`,
+  `results/metrics/03_postprocessing_variants_nht_summary.csv`.
+
+## Evaluation protocol
+
+- Segment-level macro/micro F1 computed with `sklearn.metrics.f1_score` over hard labels
+  on aligned 1 s segments (ground truth = majority vote, predictions = thresholded
+  probabilities), matching the official metric definition.
+- Development metrics come from **validation**; headline README numbers are reported on
+  the **non-hidden test** split (labels visible during the course). Scores from the two
+  evaluation setups are not directly comparable to hidden-test results.
+- All thresholds and hyperparameters were fixed using train/validation only.
 
 ## Reproducibility
-- All code resides in `src/` and is imported by notebooks.
-- Notebooks are organized to demonstrate specific stages:
-  - Data exploration (Task 3)
-  - Baseline reproduction (Andreas)
-  - Simple classifiers (Samuel)
-  - Post-processing (Andreas)
-  - Error analysis (Samuel)
-- Deterministic behavior ensured by seeding; however, slight variations may occur due to thread scheduling in parallel operations.
+
+- `SEED = 42` in `src/config.py`; every learner receives an explicit `random_state`.
+- Feature stacking, label stacking, and model sweeps are cache-aware
+  (`cache_path`/`force` arguments) so experiments are cheap to re-run.
+- Scripts `scripts/prepare_data.py`, `scripts/train.py`, `scripts/evaluate.py` run the
+  data check, the final LR training (+ threshold tuning), and evaluation, respectively;
+  they fail gracefully without the private dataset.
+- Notebooks mirror the real workflow order: data exploration (01), simple classifiers
+  (02), baseline reproduction (03), post-processing (04), error analysis (05).

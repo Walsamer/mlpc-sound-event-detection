@@ -35,6 +35,8 @@ This repository contains the work completed for the Sound Event Detection (SED) 
 
 ## Attribution Notes
 - The exact boundaries of report writing are blurred due to close collaboration; however, the report clearly attributes sections to each author.
-- Bonus work (CRNN and pretrained SED fine‑tune) was listed as stretch goals in the project plan; available artifacts do not confirm whether these were fully completed or included in the final submission.
 - No personally identifying information, internal grades, or instructor comments are included in this repository.
 
+## Potential Next Steps
+- Extend the classical pipeline with temporal deep-learning approaches such as a CRNN.
+- Fine-tune a pretrained sound event detection model and compare it with the logistic-regression system under the same validation protocol.

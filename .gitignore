@@ -1,0 +1,35 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter / IPython
+.ipynb_checkpoints/
+profile_default/
+ipython_config.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Data (not redistributable — see docs/DATASET.md)
+data/
+
+# Trained models / checkpoints
+models/
+*.joblib
+*.pkl
+*.h5
+*.pt
+*.pth
+
+# macOS
+.DS_Store
+
+# Logs / temp
+*.log
+*.tmp
+*.temp
