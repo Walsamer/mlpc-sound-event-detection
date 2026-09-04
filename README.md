@@ -109,6 +109,8 @@ mlpc-sound-event-detection/
 │   ├── final_report.pdf               # Final project report
 │   ├── task_3_report.pdf              # Task 3 report
 │   ├── task_3_slides.pdf              # Task 3 slides
+│   ├── task_4_report.pdf              # Task 4 report
+│   ├── task_4_report.pdf              # Task 4 report
 │   └── task_5_slides.pdf              # Task 5 slides
 │
 ├── results/
@@ -192,7 +194,7 @@ This work was completed as a team project by **Samuel Eder** and **Andreas Resch
 A detailed contribution breakdown is available in `docs/CONTRIBUTION_AUDIT.md`.
 
 In brief:
-- **Samuel Eder**: Feature engineering, logistic regression and random forest modeling, threshold tuning, error analysis, visualization, and integration of the final prediction pipeline.
-- **Andreas Resch**: Data loading and label processing, baseline decision‑tree model, median filtering post‑processing, evaluation infrastructure, and baseline experimentation.
-- **Joint effort**: Experimental design, report writing, slide preparation, and final review.
+- **Samuel Eder**: Feature engineering, logistic regression and random forest modeling, threshold tuning, error analysis, and integration of the final prediction pipeline.
+- **Andreas Resch**: Data loading and label processing, feature engineering, baseline decision‑tree model including finetuning of Random Forest, median filtering post‑processing, evaluation infrastructure, and baseline experimentation.
+- **Joint effort**: Experimental design, report writing, visualizations, slide preparation, and final review.
 
