@@ -1,0 +1,35 @@
+{
+  "model": "RandomForestClassifier one-vs-rest",
+  "split": "recording_grouped_split",
+  "train_split": "recording_grouped_split['dev']",
+  "test_split": "recording_grouped_split['test']",
+  "selection_method": "Best macro F1 from recording-grouped CV on development split",
+  "params": {
+    "n_estimators": 50,
+    "max_features": 0.25,
+    "min_samples_leaf": 1
+  },
+  "threshold": 0.5,
+  "macro_f1": 0.40501444320067365,
+  "micro_f1": 0.542561264116413,
+  "per_class_f1": {
+    "bell_ringing": 0.43506493506493504,
+    "coffee_machine": 0.43316062176165804,
+    "cutlery_dishes": 0.4625644134586238,
+    "door_open_close": 0.09338993329290479,
+    "footsteps": 0.31168029625057864,
+    "keyboard_typing": 0.6365630712979891,
+    "keychain": 0.5470332850940666,
+    "light_switch": 0.0,
+    "microwave": 0.6694855532064834,
+    "phone_ringing": 0.5960546282245827,
+    "running_water": 0.7901234567901234,
+    "toilet_flushing": 0.42021276595744683,
+    "vacuum_cleaner": 0.6572420634920635,
+    "wardrobe_drawer_open_close": 0.013888888888888888,
+    "window_open_close": 0.0087527352297593
+  },
+  "n_train_recordings": 2924,
+  "n_test_recordings": 732,
+  "n_test_segments": 33630
+}

@@ -1,0 +1,566 @@
+{
+  "sqrt": {
+    "1": {
+      "params": {
+        "n_estimators": 50,
+        "max_features": "sqrt",
+        "min_samples_leaf": 1
+      },
+      "macro_f1_mean": 0.3703042794813275,
+      "macro_f1_std": 0.0037084491691262065,
+      "micro_f1_mean": 0.4964699815347009,
+      "micro_f1_std": 0.00632818281676703,
+      "full_result": {
+        "label": "RF n=50 max_features=sqrt min_leaf=1 rec",
+        "fold_rows": [
+          {
+            "fold": 0,
+            "macro_f1": 0.36761903495519144,
+            "micro_f1": 0.4873032149104289
+          },
+          {
+            "fold": 1,
+            "macro_f1": 0.3684749083960202,
+            "micro_f1": 0.4918277260796946
+          },
+          {
+            "fold": 2,
+            "macro_f1": 0.36595889904846346,
+            "micro_f1": 0.50124310576401
+          },
+          {
+            "fold": 3,
+            "macro_f1": 0.3749262975651596,
+            "micro_f1": 0.504927657789893
+          },
+          {
+            "fold": 4,
+            "macro_f1": 0.3745422574418027,
+            "micro_f1": 0.49704820312947784
+          }
+        ],
+        "macro_f1_mean": 0.3703042794813275,
+        "macro_f1_std": 0.0037084491691262065,
+        "micro_f1_mean": 0.4964699815347009,
+        "micro_f1_std": 0.00632818281676703,
+        "per_class_f1_mean": {
+          "bell_ringing": 0.40525417274879094,
+          "coffee_machine": 0.5144573458931895,
+          "cutlery_dishes": 0.3885538499785204,
+          "door_open_close": 0.050808494414999725,
+          "footsteps": 0.2677245406974179,
+          "keyboard_typing": 0.5280354043045492,
+          "keychain": 0.4857843184392613,
+          "light_switch": 0.0,
+          "microwave": 0.5754360501195794,
+          "phone_ringing": 0.5745549615836555,
+          "running_water": 0.7414432322225301,
+          "toilet_flushing": 0.35088952542364876,
+          "vacuum_cleaner": 0.6682109162024633,
+          "wardrobe_drawer_open_close": 0.002518523048449094,
+          "window_open_close": 0.0008928571428571428
+        }
+      }
+    },
+    "2": {
+      "params": {
+        "n_estimators": 50,
+        "max_features": "sqrt",
+        "min_samples_leaf": 2
+      },
+      "macro_f1_mean": 0.3612762637963292,
+      "macro_f1_std": 0.003171981427724027,
+      "micro_f1_mean": 0.48801016925106333,
+      "micro_f1_std": 0.005587101063098198,
+      "full_result": {
+        "label": "RF n=50 max_features=sqrt min_leaf=2 rec",
+        "fold_rows": [
+          {
+            "fold": 0,
+            "macro_f1": 0.3583297696899955,
+            "micro_f1": 0.48016382419463294
+          },
+          {
+            "fold": 1,
+            "macro_f1": 0.3608261146449382,
+            "micro_f1": 0.48296502312645484
+          },
+          {
+            "fold": 2,
+            "macro_f1": 0.35853348546152813,
+            "micro_f1": 0.4942006768287392
+          },
+          {
+            "fold": 3,
+            "macro_f1": 0.3616024561059829,
+            "micro_f1": 0.49339608319417033
+          },
+          {
+            "fold": 4,
+            "macro_f1": 0.36708949307920136,
+            "micro_f1": 0.4893252389113196
+          }
+        ],
+        "macro_f1_mean": 0.3612762637963292,
+        "macro_f1_std": 0.003171981427724027,
+        "micro_f1_mean": 0.48801016925106333,
+        "micro_f1_std": 0.005587101063098198,
+        "per_class_f1_mean": {
+          "bell_ringing": 0.38238347775675596,
+          "coffee_machine": 0.51065515119156,
+          "cutlery_dishes": 0.3719928285822481,
+          "door_open_close": 0.04114961623878158,
+          "footsteps": 0.25005405748161297,
+          "keyboard_typing": 0.5150078260995673,
+          "keychain": 0.4768386562555896,
+          "light_switch": 0.0,
+          "microwave": 0.5650837255948169,
+          "phone_ringing": 0.5656080911962802,
+          "running_water": 0.7435598568074803,
+          "toilet_flushing": 0.32819741786913775,
+          "vacuum_cleaner": 0.6653790662870931,
+          "wardrobe_drawer_open_close": 0.0032341855840146315,
+          "window_open_close": 0.0
+        }
+      }
+    },
+    "5": {
+      "params": {
+        "n_estimators": 50,
+        "max_features": "sqrt",
+        "min_samples_leaf": 5
+      },
+      "macro_f1_mean": 0.354843185739013,
+      "macro_f1_std": 0.004982573004416156,
+      "micro_f1_mean": 0.4820542194320828,
+      "micro_f1_std": 0.00828188511267889,
+      "full_result": {
+        "label": "RF n=50 max_features=sqrt min_leaf=5 rec",
+        "fold_rows": [
+          {
+            "fold": 0,
+            "macro_f1": 0.3487676831012655,
+            "micro_f1": 0.4703671759487432
+          },
+          {
+            "fold": 1,
+            "macro_f1": 0.35190723557836195,
+            "micro_f1": 0.47616146230007617
+          },
+          {
+            "fold": 2,
+            "macro_f1": 0.3521015294909482,
+            "micro_f1": 0.4887135147681773
+          },
+          {
+            "fold": 3,
+            "macro_f1": 0.3597162045222245,
+            "micro_f1": 0.4933308971313722
+          },
+          {
+            "fold": 4,
+            "macro_f1": 0.36172327600226495,
+            "micro_f1": 0.4816980470120454
+          }
+        ],
+        "macro_f1_mean": 0.354843185739013,
+        "macro_f1_std": 0.004982573004416156,
+        "micro_f1_mean": 0.4820542194320828,
+        "micro_f1_std": 0.00828188511267889,
+        "per_class_f1_mean": {
+          "bell_ringing": 0.3597508946700304,
+          "coffee_machine": 0.497449772713969,
+          "cutlery_dishes": 0.3611797032245868,
+          "door_open_close": 0.040884640969278276,
+          "footsteps": 0.2436320635682164,
+          "keyboard_typing": 0.5063118705064409,
+          "keychain": 0.4678530860304888,
+          "light_switch": 0.0,
+          "microwave": 0.5641211484054306,
+          "phone_ringing": 0.5593150399791508,
+          "running_water": 0.7408892153940388,
+          "toilet_flushing": 0.31933067276060734,
+          "vacuum_cleaner": 0.6580734737770582,
+          "wardrobe_drawer_open_close": 0.0038562040858983377,
+          "window_open_close": 0.0
+        }
+      }
+    }
+  },
+  "log2": {
+    "1": {
+      "params": {
+        "n_estimators": 50,
+        "max_features": "log2",
+        "min_samples_leaf": 1
+      },
+      "macro_f1_mean": 0.3262761772985958,
+      "macro_f1_std": 0.005745739597754664,
+      "micro_f1_mean": 0.4497402265062208,
+      "micro_f1_std": 0.008738898951270774,
+      "full_result": {
+        "label": "RF n=50 max_features=log2 min_leaf=1 rec",
+        "fold_rows": [
+          {
+            "fold": 0,
+            "macro_f1": 0.3187798527760215,
+            "micro_f1": 0.4354960392304791
+          },
+          {
+            "fold": 1,
+            "macro_f1": 0.3236601300208777,
+            "micro_f1": 0.4442995124072176
+          },
+          {
+            "fold": 2,
+            "macro_f1": 0.32371212257142573,
+            "micro_f1": 0.4559072168006407
+          },
+          {
+            "fold": 3,
+            "macro_f1": 0.3298658671840362,
+            "micro_f1": 0.4596570930702928
+          },
+          {
+            "fold": 4,
+            "macro_f1": 0.33536291394061796,
+            "micro_f1": 0.45334127102247357
+          }
+        ],
+        "macro_f1_mean": 0.3262761772985958,
+        "macro_f1_std": 0.005745739597754664,
+        "micro_f1_mean": 0.4497402265062208,
+        "micro_f1_std": 0.008738898951270774,
+        "per_class_f1_mean": {
+          "bell_ringing": 0.3078760526292702,
+          "coffee_machine": 0.4870110027416706,
+          "cutlery_dishes": 0.33873831013435085,
+          "door_open_close": 0.03153476012214164,
+          "footsteps": 0.2230467816529796,
+          "keyboard_typing": 0.38808344209745405,
+          "keychain": 0.42451533340268616,
+          "light_switch": 0.0,
+          "microwave": 0.519859893872917,
+          "phone_ringing": 0.5182337953060049,
+          "running_water": 0.7332799706618627,
+          "toilet_flushing": 0.276486228196264,
+          "vacuum_cleaner": 0.6432411026846645,
+          "wardrobe_drawer_open_close": 0.0013411313905414943,
+          "window_open_close": 0.0008948545861297539
+        }
+      }
+    },
+    "2": {
+      "params": {
+        "n_estimators": 50,
+        "max_features": "log2",
+        "min_samples_leaf": 2
+      },
+      "macro_f1_mean": 0.3149855057468106,
+      "macro_f1_std": 0.007294258075009442,
+      "micro_f1_mean": 0.4375223408887724,
+      "micro_f1_std": 0.00941239284195882,
+      "full_result": {
+        "label": "RF n=50 max_features=log2 min_leaf=2 rec",
+        "fold_rows": [
+          {
+            "fold": 0,
+            "macro_f1": 0.30744834584423325,
+            "micro_f1": 0.4224848291280741
+          },
+          {
+            "fold": 1,
+            "macro_f1": 0.3130288605647348,
+            "micro_f1": 0.43235081317436846
+          },
+          {
+            "fold": 2,
+            "macro_f1": 0.3078689825423171,
+            "micro_f1": 0.4416046294342807
+          },
+          {
+            "fold": 3,
+            "macro_f1": 0.3203926223501996,
+            "micro_f1": 0.45024367237855684
+          },
+          {
+            "fold": 4,
+            "macro_f1": 0.3261887174325685,
+            "micro_f1": 0.4409277603285818
+          }
+        ],
+        "macro_f1_mean": 0.3149855057468106,
+        "macro_f1_std": 0.007294258075009442,
+        "micro_f1_mean": 0.4375223408887724,
+        "micro_f1_std": 0.00941239284195882,
+        "per_class_f1_mean": {
+          "bell_ringing": 0.29850744884515545,
+          "coffee_machine": 0.4738334336768964,
+          "cutlery_dishes": 0.3190801154625489,
+          "door_open_close": 0.019403837864577313,
+          "footsteps": 0.20836376533523474,
+          "keyboard_typing": 0.3595202650350462,
+          "keychain": 0.410682640626011,
+          "light_switch": 0.0,
+          "microwave": 0.5110226148321049,
+          "phone_ringing": 0.5046505702206886,
+          "running_water": 0.7297354160639874,
+          "toilet_flushing": 0.25150076268046473,
+          "vacuum_cleaner": 0.6371608749061809,
+          "wardrobe_drawer_open_close": 0.001320840653263062,
+          "window_open_close": 0.0
+        }
+      }
+    },
+    "5": {
+      "params": {
+        "n_estimators": 50,
+        "max_features": "log2",
+        "min_samples_leaf": 5
+      },
+      "macro_f1_mean": 0.3059568047007291,
+      "macro_f1_std": 0.006025931770893842,
+      "micro_f1_mean": 0.4300142170381777,
+      "micro_f1_std": 0.008907914970852271,
+      "full_result": {
+        "label": "RF n=50 max_features=log2 min_leaf=5 rec",
+        "fold_rows": [
+          {
+            "fold": 0,
+            "macro_f1": 0.29812195228649724,
+            "micro_f1": 0.416838576585869
+          },
+          {
+            "fold": 1,
+            "macro_f1": 0.30301995946831717,
+            "micro_f1": 0.42349882696087754
+          },
+          {
+            "fold": 2,
+            "macro_f1": 0.303053906845509,
+            "micro_f1": 0.4369284805910495
+          },
+          {
+            "fold": 3,
+            "macro_f1": 0.3106003386496806,
+            "micro_f1": 0.44146604840246456
+          },
+          {
+            "fold": 4,
+            "macro_f1": 0.3149878662536417,
+            "micro_f1": 0.43133915265062805
+          }
+        ],
+        "macro_f1_mean": 0.3059568047007291,
+        "macro_f1_std": 0.006025931770893842,
+        "micro_f1_mean": 0.4300142170381777,
+        "micro_f1_std": 0.008907914970852271,
+        "per_class_f1_mean": {
+          "bell_ringing": 0.25530078548075685,
+          "coffee_machine": 0.4690781424612057,
+          "cutlery_dishes": 0.3076192801764284,
+          "door_open_close": 0.01740636579385695,
+          "footsteps": 0.19918866782344052,
+          "keyboard_typing": 0.3505937269498388,
+          "keychain": 0.40060115713520056,
+          "light_switch": 0.0,
+          "microwave": 0.5004508676192408,
+          "phone_ringing": 0.48657606698651373,
+          "running_water": 0.727932831661009,
+          "toilet_flushing": 0.23578666727276384,
+          "vacuum_cleaner": 0.638817511150682,
+          "wardrobe_drawer_open_close": 0.0,
+          "window_open_close": 0.0
+        }
+      }
+    }
+  },
+  "0.25": {
+    "1": {
+      "params": {
+        "n_estimators": 50,
+        "max_features": 0.25,
+        "min_samples_leaf": 1
+      },
+      "macro_f1_mean": 0.40741185554796644,
+      "macro_f1_std": 0.002568126012303988,
+      "micro_f1_mean": 0.5383958417126606,
+      "micro_f1_std": 0.0051418442028219585,
+      "full_result": {
+        "label": "RF n=50 max_features=0.25 min_leaf=1 rec",
+        "fold_rows": [
+          {
+            "fold": 0,
+            "macro_f1": 0.40641084852953924,
+            "micro_f1": 0.5309836775964177
+          },
+          {
+            "fold": 1,
+            "macro_f1": 0.4044789673143741,
+            "micro_f1": 0.5348538111978051
+          },
+          {
+            "fold": 2,
+            "macro_f1": 0.4052726158375661,
+            "micro_f1": 0.543671819522587
+          },
+          {
+            "fold": 3,
+            "macro_f1": 0.4100273072735708,
+            "micro_f1": 0.5444559466298596
+          },
+          {
+            "fold": 4,
+            "macro_f1": 0.41086953878478216,
+            "micro_f1": 0.5380139536166341
+          }
+        ],
+        "macro_f1_mean": 0.40741185554796644,
+        "macro_f1_std": 0.002568126012303988,
+        "micro_f1_mean": 0.5383958417126606,
+        "micro_f1_std": 0.0051418442028219585,
+        "per_class_f1_mean": {
+          "bell_ringing": 0.45191048618278506,
+          "coffee_machine": 0.539239745362037,
+          "cutlery_dishes": 0.44916220561942016,
+          "door_open_close": 0.08749089007124611,
+          "footsteps": 0.31555309596821624,
+          "keyboard_typing": 0.6402334290350645,
+          "keychain": 0.5181531620964391,
+          "light_switch": 0.0026143790849673205,
+          "microwave": 0.6053619060655556,
+          "phone_ringing": 0.6289094307790585,
+          "running_water": 0.7576810456380249,
+          "toilet_flushing": 0.41998962825044117,
+          "vacuum_cleaner": 0.6782446382100298,
+          "wardrobe_drawer_open_close": 0.013401830969575087,
+          "window_open_close": 0.003231959886636146
+        }
+      }
+    },
+    "2": {
+      "params": {
+        "n_estimators": 50,
+        "max_features": 0.25,
+        "min_samples_leaf": 2
+      },
+      "macro_f1_mean": 0.4013377914587467,
+      "macro_f1_std": 0.003279440398256663,
+      "micro_f1_mean": 0.5322827442336464,
+      "micro_f1_std": 0.003963597415965789,
+      "full_result": {
+        "label": "RF n=50 max_features=0.25 min_leaf=2 rec",
+        "fold_rows": [
+          {
+            "fold": 0,
+            "macro_f1": 0.39832971874188877,
+            "micro_f1": 0.5250811664570476
+          },
+          {
+            "fold": 1,
+            "macro_f1": 0.40208164610369285,
+            "micro_f1": 0.5322450392247347
+          },
+          {
+            "fold": 2,
+            "macro_f1": 0.39677388404897995,
+            "micro_f1": 0.533754222739104
+          },
+          {
+            "fold": 3,
+            "macro_f1": 0.4046275043218678,
+            "micro_f1": 0.5371525147153098
+          },
+          {
+            "fold": 4,
+            "macro_f1": 0.40487620407730435,
+            "micro_f1": 0.5331807780320366
+          }
+        ],
+        "macro_f1_mean": 0.4013377914587467,
+        "macro_f1_std": 0.003279440398256663,
+        "micro_f1_mean": 0.5322827442336464,
+        "micro_f1_std": 0.003963597415965789,
+        "per_class_f1_mean": {
+          "bell_ringing": 0.4480436256201095,
+          "coffee_machine": 0.5352933659150441,
+          "cutlery_dishes": 0.44106220845805844,
+          "door_open_close": 0.08094257743210179,
+          "footsteps": 0.30705786072879243,
+          "keyboard_typing": 0.6348503283489559,
+          "keychain": 0.5145448472763957,
+          "light_switch": 0.0,
+          "microwave": 0.5972687871833584,
+          "phone_ringing": 0.6219319521271778,
+          "running_water": 0.7537828198983783,
+          "toilet_flushing": 0.40267481594641047,
+          "vacuum_cleaner": 0.6730085638773426,
+          "wardrobe_drawer_open_close": 0.007332391796348185,
+          "window_open_close": 0.0022727272727272726
+        }
+      }
+    },
+    "5": {
+      "params": {
+        "n_estimators": 50,
+        "max_features": 0.25,
+        "min_samples_leaf": 5
+      },
+      "macro_f1_mean": 0.3988777054456985,
+      "macro_f1_std": 0.002547210093243736,
+      "micro_f1_mean": 0.5306337127645635,
+      "micro_f1_std": 0.003851940408382942,
+      "full_result": {
+        "label": "RF n=50 max_features=0.25 min_leaf=5 rec",
+        "fold_rows": [
+          {
+            "fold": 0,
+            "macro_f1": 0.4002041905297832,
+            "micro_f1": 0.5258765098304288
+          },
+          {
+            "fold": 1,
+            "macro_f1": 0.3985968825732567,
+            "micro_f1": 0.529345143023087
+          },
+          {
+            "fold": 2,
+            "macro_f1": 0.3943146290157885,
+            "micro_f1": 0.5329629115154882
+          },
+          {
+            "fold": 3,
+            "macro_f1": 0.40197715940547063,
+            "micro_f1": 0.5368258320450369
+          },
+          {
+            "fold": 4,
+            "macro_f1": 0.3992956657041932,
+            "micro_f1": 0.5281581674087765
+          }
+        ],
+        "macro_f1_mean": 0.3988777054456985,
+        "macro_f1_std": 0.002547210093243736,
+        "micro_f1_mean": 0.5306337127645635,
+        "micro_f1_std": 0.003851940408382942,
+        "per_class_f1_mean": {
+          "bell_ringing": 0.43899847024684335,
+          "coffee_machine": 0.5336313927866303,
+          "cutlery_dishes": 0.4375789487420043,
+          "door_open_close": 0.0793511762252763,
+          "footsteps": 0.30012818512446177,
+          "keyboard_typing": 0.635467115361105,
+          "keychain": 0.5131591866205681,
+          "light_switch": 0.0026143790849673205,
+          "microwave": 0.5909122040632913,
+          "phone_ringing": 0.6203844771465333,
+          "running_water": 0.7568038157869253,
+          "toilet_flushing": 0.39650975561134316,
+          "vacuum_cleaner": 0.6729167516359018,
+          "wardrobe_drawer_open_close": 0.0030544123897308984,
+          "window_open_close": 0.0016553108598940124
+        }
+      }
+    }
+  }
+}
