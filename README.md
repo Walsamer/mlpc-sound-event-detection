@@ -35,15 +35,18 @@ flowchart LR
 - **Scaling**: Imputation + z-score standardization, fit on the training split only and applied to validation/test (no leakage).
 
 ### Modeling
-The final system is a set of independent per-class binary Logistic Regression classifiers (multi-label one-vs-rest). A decision-tree baseline was provided with the challenge and reproduced for comparison; random forests were considered during model selection in an earlier task stage, and logistic regression was selected because it generalized better on the validation split.
+The final system is a set of independent per-class binary Logistic Regression classifiers (multi-label one-vs-rest). A decision-tree baseline was provided with the challenge and reproduced for comparison. A one-vs-rest random forest was tuned and evaluated in an earlier task stage (Task 4, see `notebooks/06_random_forest.ipynb`); logistic regression was selected because it scored higher under the same cross-validation protocol (details below).
 
 | Model               | Feature Representation | Temporal context | Role |
 | ------------------- | ---------------------- | ----------------: | ---- |
 | Decision Tree       | 960-d descriptor stats  |               No | provided challenge baseline, reproduced |
 | Logistic Regression | 960-d descriptor stats  |               No | final system (one binary LR per class) |
+| Random Forest       | 960-d descriptor stats  |               No | evaluated in Task 4 (`06_random_forest.ipynb`), not selected |
 
 All classifiers treat each segment as an independent sample; temporal coherence is handled explicitly by the post-processing stage. Hyperparameters and decision thresholds were selected on the validation split:
 - Logistic regression: regularization strength `C` swept over {0.001, 0.01, 0.1, 1, 10} × class weighting {none, balanced}; **C=0.01, no weighting** won.
+- Random forest: 9 configurations, `max_features` {sqrt, log2, 0.25} × `min_samples_leaf` {1, 2, 5} at `n_estimators=50`, compared by macro F1 in recording-grouped 5-fold cross-validation on the development split. The best setting (`max_features=0.25`, `min_samples_leaf=1`) reached 0.407 ± 0.003 and was frozen, retrained on the full development split and evaluated once on the held-out recording-grouped test split: **macro F1 0.405, micro F1 0.543**. Larger forests (`n_estimators` 100 and 200) were not evaluated.
+- Model choice: under the same recording-grouped CV, logistic regression reached 0.462 macro F1 versus 0.407 for the best random forest. These Task 4 figures use a different protocol than the Task 5 results below and must not be compared with them.
 - Per-class decision thresholds tuned on the validation split over a 0.05–0.95 grid (maximizing per-class F1), never on the hidden test set.
 
 ### Handling Class Imbalance
@@ -74,6 +77,7 @@ Performance on the non-hidden test set (used for validation during development):
 - Per-class validation-tuned thresholds beat a global 0.5 threshold by a large margin.
 - Median filtering of per-class probabilities (window = 5 s) improved non-hidden-test macro F1 from 0.541 to **0.559** by suppressing spurious isolated activations; larger windows (>= 9 s) start to erase genuinely short events.
 - Stronger, class-aware post-processing variants reached 0.569 macro F1 on the non-hidden test split, but the final submission kept the simpler, reproducible median-filter system.
+- The random forest shows the same hard tail on its held-out test split: `light_switch` (0.00), `window_open_close` (0.01) and `wardrobe_drawer_open_close` (0.01) stay near zero, while `running_water` (0.79), `microwave` (0.67) and `vacuum_cleaner` (0.66) are detected best.
 
 ## Repository Structure
 
@@ -87,44 +91,48 @@ mlpc-sound-event-detection/
 │
 ├── src/
 │   ├── __init__.py
-│   ├── config.py          # paths, constants, seeds
-│   ├── data_io.py         # loading features and metadata
-│   ├── features.py        # feature extraction, scaling, selection
-│   ├── labels.py          # annotation to label conversion
-│   ├── models.py          # classifier wrappers (LR, RF, etc.)
-│   ├── segments.py        # segment handling and decimation
-│   ├── evaluate.py        # segment-based macro/micro F1
-│   ├── postprocess.py     # temporal smoothing (median filtering)
-│   ├── predict.py         # segment probabilities to event CSV
-│   └── viz.py             # visualization utilities
+│   ├── config.py                  # paths, constants, seeds
+│   ├── data_io.py                 # loading features and metadata
+│   ├── features.py                # feature extraction, scaling, selection
+│   ├── labels.py                  # annotation to label conversion
+│   ├── models.py                  # classifier wrappers
+│   ├── segments.py                # segment handling and decimation
+│   ├── evaluate.py                # segment-based macro/micro F1
+│   ├── postprocess.py             # temporal smoothing (median filtering)
+│   ├── postprocess_variants.py    # alternative post-processing variants
+│   ├── predict.py                 # segment probabilities to event CSV
+│   └── viz.py                     # visualization utilities
 │
 ├── notebooks/
-│   ├── 01_data_exploration.ipynb      # Annotation agreement, feature statistics, t‑SNE visualizations
-│   ├── 02_simple_classifiers.ipynb    # Logistic regression & random forest: hyperparameter search, threshold tuning
-│   ├── 03_baseline.ipynb              # Decision‑tree baseline reproduction
-│   ├── 04_postprocessing.ipynb        # Median filtering evaluation and window‑size selection
-│   └── 05_error_analysis.ipynb        # Qualitative error analysis on mis‑detected audio clips
+│   ├── 01_data_exploration.ipynb      # Annotation agreement, feature statistics, t-SNE visualizations
+│   ├── 02_simple_classifiers.ipynb    # Logistic regression: hyperparameter search, threshold tuning
+│   ├── 03_baseline.ipynb              # Decision-tree baseline reproduction
+│   ├── 04_postprocessing.ipynb        # Median filtering evaluation and window-size selection
+│   ├── 05_error_analysis.ipynb        # Qualitative error analysis on mis-detected audio clips
+│   └── 06_random_forest.ipynb         # Random forest: grid search (grouped CV) and held-out test (outputs only)
 │
 ├── reports/
 │   ├── final_report.pdf               # Final project report
 │   ├── task_3_report.pdf              # Task 3 report
 │   ├── task_3_slides.pdf              # Task 3 slides
 │   ├── task_4_report.pdf              # Task 4 report
-│   ├── task_4_report.pdf              # Task 4 report
+│   ├── task_4_slides.pdf              # Task 4 slides
 │   └── task_5_slides.pdf              # Task 5 slides
 │
 ├── results/
 │   ├── figures/                       # Final plots (PNG) used in reports and slides
-│   │   ├── *.png                      # e.g., per‑class F1, confusion matrices, feature sweeps
-│   ├── metrics/                       # Summary statistics (CSV)
+│   │   └── *.png                      # figures, e.g., per-class F1, confusion matrices, feature sweeps, heatmaps
+│   ├── metrics/                       # Summary statistics (CSV/JSON)
 │   │   ├── 02_lr_best_summary.csv     # LR hyperparameter tuning results
 │   │   ├── 02_postprocessing_window_sweep_from_andreas.csv  # Median filter sweep
-│   │   └── 03_postprocessing_variants_nht_summary.csv       # Post‑processing comparison
+│   │   ├── 03_postprocessing_variants_nht_summary.csv       # Post-processing comparison
+│   │   ├── 06_rf_grid_search_n50.json         # RF grid search: 5-fold grouped CV, per configuration
+│   │   └── 06_rf_final_test_results.json      # RF final evaluation on the held-out grouped test split
 │   └── predictions.csv                # Final submission CSV (hidden test set predictions)
 │
 ├── docs/
 │   ├── CONTRIBUTION_AUDIT.md          # Detailed contribution attribution
-│   ├── METHODOLOGY.md                 # In‑depth methodological description
+│   ├── METHODOLOGY.md                 # In-depth methodological description
 │   └── DATASET.md                     # Expected dataset structure and access instructions
 │
 └── scripts/
@@ -166,6 +174,8 @@ To reproduce the results (excluding the hidden test set predictions):
    jupyter notebook notebooks/05_error_analysis.ipynb
    ```
 
+   Note: `notebooks/06_random_forest.ipynb` is included with its saved outputs for reference. It needs Task 4 artifacts (splits, labels) that are not redistributed, so it is not meant to be re-run as is; its results are in `results/metrics/06_rf_*.json`.
+
 4. **Train and evaluate a model**
    ```bash
    python scripts/prepare_data.py   # inspects dataset structure
@@ -186,15 +196,16 @@ See `docs/DATASET.md` for the expected directory structure and feature format.
 - `reports/final_report.pdf`: Final project report.
 - `reports/task_3_report.pdf`: Report on data exploration and feature analysis.
 - `reports/task_3_slides.pdf`: Slide deck for Task 3.
+- `reports/task_4_report.pdf`: Report on the Task 4 model comparison.
+- `reports/task_4_slides.pdf`: Slide deck for Task 4.
 - `reports/task_5_slides.pdf`: Slide deck for the final project.
 
 ## Authors and Contribution
 
-This work was completed as a team project by **Samuel Eder** and **Andreas Resch** (Team Quantized Encoders).  
+This work was completed as a team project by **Samuel Eder** and **Andreas Resch** (Team Quantized Encoders).
 A detailed contribution breakdown is available in `docs/CONTRIBUTION_AUDIT.md`.
 
 In brief:
-- **Samuel Eder**: Feature engineering, logistic regression and random forest modeling, threshold tuning, error analysis, and integration of the final prediction pipeline.
-- **Andreas Resch**: Data loading and label processing, feature engineering, baseline decision‑tree model including finetuning of Random Forest, median filtering post‑processing, evaluation infrastructure, and baseline experimentation.
-- **Joint effort**: Experimental design, report writing, visualizations, slide preparation, and final review.
-
+- **Samuel Eder**: Logistic regression modeling (final system), threshold tuning, qualitative error analysis, and the final prediction pipeline (probabilities to event-level CSV).
+- **Andreas Resch**: Data loading and label processing, decision-tree baseline, random forest (design, hyperparameter search and evaluation), median-filter post-processing, and the evaluation infrastructure.
+- **Joint effort**: Experimental design, feature handling, visualizations (created by both authors; individual attribution was not tracked), report writing, slide preparation, and final review.
